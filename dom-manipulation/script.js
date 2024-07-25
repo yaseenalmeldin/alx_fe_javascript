@@ -1,9 +1,44 @@
+// Assuming Axios is already included in the project
+const axios = require('axios');
+
 // Initial quotes array
 let quotes = JSON.parse(localStorage.getItem('quotes')) || [
     { text: "Life is what happens when you're busy making other plans.", category: "Life" },
     { text: "The greatest glory in living lies not in never falling, but in rising every time we fall.", category: "Inspiration" },
     { text: "The purpose of our lives is to be happy.", category: "Happiness" }
 ];
+
+// Function to fetch quotes from the server
+async function fetchQuotesFromServer() {
+    try {
+        const response = await axios.get('https://jsonplaceholder.typicode.com/posts');
+        const serverQuotes = response.data.map(post => ({ text: post.title, category: 'Server' }));
+        const localQuotes = JSON.parse(localStorage.getItem('quotes')) || [];
+        const mergedQuotes = [...serverQuotes, ...localQuotes];
+        localStorage.setItem('quotes', JSON.stringify(mergedQuotes));
+        quotes = mergedQuotes;
+        populateCategories();
+        filterQuotes();
+    } catch (error) {
+        console.error('Error fetching quotes from server:', error);
+    }
+}
+
+// Function to sync quotes with the server
+async function syncQuotesWithServer() {
+    const localQuotes = JSON.parse(localStorage.getItem('quotes')) || [];
+    try {
+        for (const quote of localQuotes) {
+            await axios.post('https://jsonplaceholder.typicode.com/posts', {
+                title: quote.text,
+                body: quote.category
+            });
+        }
+        alert('Quotes synced with server successfully!');
+    } catch (error) {
+        console.error('Error syncing quotes with server:', error);
+    }
+}
 
 // Function to display a random quote
 function showRandomQuote() {
@@ -36,6 +71,9 @@ function addQuote() {
 
         // Update category filter dropdown
         populateCategories();
+
+        // Sync new quote with the server
+        syncQuotesWithServer();
     } else {
         alert('Please enter both a quote and a category.');
     }
@@ -140,6 +178,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('exportQuotesBtn').addEventListener('click', exportQuotes);
     createAddQuoteForm();
     populateCategories();
+
+    // Fetch quotes from server
+    fetchQuotesFromServer();
 
     // Display last viewed quote if exists in session storage
     const lastViewedQuote = JSON.parse(sessionStorage.getItem('lastViewedQuote'));

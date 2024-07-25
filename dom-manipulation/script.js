@@ -1,6 +1,3 @@
-// Assuming Axios is already included in the project
-const axios = require('axios');
-
 // Initial quotes array
 let quotes = JSON.parse(localStorage.getItem('quotes')) || [
     { text: "Life is what happens when you're busy making other plans.", category: "Life" },
@@ -11,8 +8,9 @@ let quotes = JSON.parse(localStorage.getItem('quotes')) || [
 // Function to fetch quotes from the server
 async function fetchQuotesFromServer() {
     try {
-        const response = await axios.get('https://jsonplaceholder.typicode.com/posts');
-        const serverQuotes = response.data.map(post => ({ text: post.title, category: 'Server' }));
+        const response = await fetch('https://jsonplaceholder.typicode.com/posts');
+        const data = await response.json();
+        const serverQuotes = data.map(post => ({ text: post.title, category: 'Server' }));
         const localQuotes = JSON.parse(localStorage.getItem('quotes')) || [];
         const mergedQuotes = [...serverQuotes, ...localQuotes];
         localStorage.setItem('quotes', JSON.stringify(mergedQuotes));
@@ -29,9 +27,15 @@ async function syncQuotesWithServer() {
     const localQuotes = JSON.parse(localStorage.getItem('quotes')) || [];
     try {
         for (const quote of localQuotes) {
-            await axios.post('https://jsonplaceholder.typicode.com/posts', {
-                title: quote.text,
-                body: quote.category
+            await fetch('https://jsonplaceholder.typicode.com/posts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    title: quote.text,
+                    body: quote.category
+                })
             });
         }
         alert('Quotes synced with server successfully!');

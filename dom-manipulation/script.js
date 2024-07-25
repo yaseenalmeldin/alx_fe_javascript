@@ -15,8 +15,6 @@ function showRandomQuote() {
     sessionStorage.setItem('lastViewedQuote', JSON.stringify(randomQuote));
 }
 
-// Function to create the add quote form (not needed as it's directly in HTML now)
-
 // Function to add a new quote
 function addQuote() {
     const newQuoteText = document.getElementById('newQuoteText').value.trim();
@@ -43,14 +41,18 @@ function addQuote() {
 // Function to export quotes to a JSON file
 function exportQuotes() {
     const dataStr = JSON.stringify(quotes);
-    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
 
     const exportFileDefaultName = 'quotes.json';
 
     const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('href', url);
     linkElement.setAttribute('download', exportFileDefaultName);
     linkElement.click();
+
+    // Clean up
+    URL.revokeObjectURL(url);
 }
 
 // Function to import quotes from a JSON file

@@ -186,6 +186,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Fetch quotes from server
     fetchQuotesFromServer();
 
+    // Periodically sync quotes with the server
+    setInterval(syncQuotesWithServer, 60000); // Sync every 60 seconds
+
     // Display last viewed quote if exists in session storage
     const lastViewedQuote = JSON.parse(sessionStorage.getItem('lastViewedQuote'));
     if (lastViewedQuote) {

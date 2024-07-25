@@ -52,9 +52,12 @@ function exportQuotes() {
     const linkElement = document.createElement('a');
     linkElement.setAttribute('href', url);
     linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.textContent = 'Export Quotes';
+    document.body.appendChild(linkElement);
     linkElement.click();
 
     // Clean up
+    document.body.removeChild(linkElement);
     URL.revokeObjectURL(url);
 }
 
@@ -86,7 +89,7 @@ function createAddQuoteForm() {
     categoryInput.placeholder = 'Enter quote category';
 
     const addButton = document.createElement('button');
-    addButton.innerText = 'Add Quote';
+    addButton.textContent = 'Add Quote';
     addButton.onclick = addQuote;
 
     formContainer.appendChild(quoteInput);
@@ -108,7 +111,7 @@ function populateCategories() {
     uniqueCategories.forEach(category => {
         const option = document.createElement('option');
         option.value = category;
-        option.innerText = category;
+        option.textContent = category;
         categoryFilter.appendChild(option);
     });
 }
